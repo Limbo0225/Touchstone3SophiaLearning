@@ -1,0 +1,110 @@
+/* Mobile-First Base Styles */
+body {
+    font-family: Georgia, serif;
+    background-color: #fdfbf7;
+    color: #2c1810;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #f5efe6;
+    padding: 20px;
+    text-align: center;
+    border-bottom: 2px solid #e7dfd5;
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
+nav a {
+    color: #b45309;
+    text-decoration: none;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+nav a:hover {
+    text-decoration: underline;
+}
+
+main {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+section {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+h1, h2, h3 {
+    font-family: Georgia, serif;
+    color: #2c1810;
+}
+
+img, video, picture img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+}
+
+fieldset {
+    border: 1px solid #dcd6cd;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+legend {
+    font-weight: bold;
+    color: #b45309;
+}
+
+button {
+    background-color: #b45309;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #92400e;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #f5efe6;
+    color: #6b7280;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Media Query for Larger Screens */
+@media (min-width: 768px) {
+    nav ul {
+        flex-direction: row;
+        justify-content: center;
+        gap: 30px;
+    }
+
+    main {
+        padding: 40px;
+    }
+}
