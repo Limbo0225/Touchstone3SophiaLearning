@@ -2,38 +2,41 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Products</title>
-    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products - North Star Bakery</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <header>
-        <img src="bakery-logo.png" alt="logo">
-        <h1>Our Products</h1>
-        <nav>
+        <h1>North Star Bakery</h1>
+        <nav aria-label="Main Navigation">
             <ul>
                 <li><a href="index.html">Home</a></li>
-                <li><a href="products.html">Products</a></li>
+                <li><a href="products.html" aria-current="page">Products</a></li>
                 <li><a href="about.html">About Us</a></li>
                 <li><a href="contact.html">Contact Us</a></li>
             </ul>
         </nav>
     </header>
+
     <main>
-        <section>
-            <h2>Breads</h2>
-            <img src="bakery-bread.jpg" alt="bread">
-            <p>Artisan bread made fresh. Prices $4.50 to $9.00.</p>
-        </section>
-        <section>
-            <h2>Signature Loaf</h2>
-            <figure>
-                <img src="bakery-signature-loaf.jpg" alt="loaf">
-                <figcaption>Our famous sourdough loaf.</figcaption>
-            </figure>
-        </section>
+        <h2>Our Bakery Products</h2>
+        
+        <!-- Dynamic Filter Buttons -->
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-category="all">All Items</button>
+            <button class="filter-btn" data-category="bread">Breads</button>
+            <button class="filter-btn" data-category="pastry">Pastries</button>
+        </div>
+
+        <!-- Menu Grid Populated by JavaScript -->
+        <div class="menu-grid" id="menu-container"></div>
     </main>
+
     <footer>
-        <p>Copyright 2026</p>
+        <p>&copy; 2026 North Star Bakery. All rights reserved.</p>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
