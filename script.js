@@ -75,9 +75,18 @@ function initFormValidationAndStorage() {
     // Load stored user data from localStorage
     loadStoredUserData(nameInput, emailInput, welcomeDiv);
 
-    // Save field updates live as user types to support persistence
-    nameInput.addEventListener('input', () => localStorage.setItem('bakery_user_name', nameInput.value));
-    emailInput.addEventListener('input', () => localStorage.setItem('bakery_user_email', emailInput.value));
+    // Save field updates live as user types (only when text is not empty)
+    nameInput.addEventListener('input', () => {
+        if (nameInput.value.trim()) {
+            localStorage.setItem('bakery_user_name', nameInput.value.trim());
+        }
+    });
+
+    emailInput.addEventListener('input', () => {
+        if (emailInput.value.trim()) {
+            localStorage.setItem('bakery_user_email', emailInput.value.trim());
+        }
+    });
 
     // Form Submission Validation
     form.addEventListener('submit', (e) => {
@@ -91,14 +100,21 @@ function initFormValidationAndStorage() {
 
         // Prevent submission if invalid
         if (isNameValid && isEmailValid && isMessageValid) {
-            // Persist confirmed submission data
-            localStorage.setItem('bakery_user_name', nameInput.value.trim());
-            localStorage.setItem('bakery_user_email', emailInput.value.trim());
+            const savedName = nameInput.value.trim();
+            const savedEmail = emailInput.value.trim();
+
+            // Persist confirmed submission data explicitly
+            localStorage.setItem('bakery_user_name', savedName);
+            localStorage.setItem('bakery_user_email', savedEmail);
 
             alert('Thank you! Your message has been sent successfully.');
-            form.reset();
+
+            // Only clear the message box so name/email stay filled in
+            messageInput.value = '';
+
+            // Update welcome banner immediately
             if (welcomeDiv) {
-                welcomeDiv.textContent = `Welcome back, ${localStorage.getItem('bakery_user_name')}!`;
+                welcomeDiv.innerHTML = `<p style="color: #78350f; font-weight: bold; margin-bottom: 1rem;">Welcome back, ${savedName}!</p>`;
             }
         }
     });
