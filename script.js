@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Determine which page the user is on
     if (document.getElementById('menu-container')) {
         initMenuFilter();
     }
@@ -10,10 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ==========================================================================
-   STEPS 1 & 2: DYNAMIC FILTERING & MENU DATA
+   DYNAMIC MENU FILTERING
    ========================================================================== */
 
-// Menu items dataset (Array of Objects)
 const menuItems = [
     { id: 1, name: "Artisan Sourdough", category: "bread", price: "$7.50", desc: "Classic naturally leavened sourdough with a crisp crust." },
     { id: 2, name: "Butter Croissant", category: "pastry", price: "$4.00", desc: "Flaky, layered French pastry made with premium European butter." },
@@ -26,31 +24,25 @@ function initMenuFilter() {
     const container = document.getElementById('menu-container');
     const filterButtons = document.querySelectorAll('.filter-btn');
 
-    // Initial render of all items
     renderMenuItems(menuItems, container);
 
-    // Event listener for category selection
     filterButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             filterButtons.forEach(btn => btn.classList.remove('active'));
             e.target.classList.add('active');
 
             const category = e.target.getAttribute('data-category');
-            filterAndRender(category, container);
+            if (category === 'all') {
+                renderMenuItems(menuItems, container);
+            } else {
+                renderMenuItems(menuItems.filter(item => item.category === category), container);
+            }
         });
     });
 }
 
-function filterAndRender(category, container) {
-    if (category === 'all') {
-        renderMenuItems(menuItems, container);
-    } else {
-        const filtered = menuItems.filter(item => item.category === category);
-        renderMenuItems(filtered, container);
-    }
-}
-
 function renderMenuItems(items, container) {
+    if (!container) return;
     container.innerHTML = items.map(item => `
         <article class="menu-item">
             <h3>${item.name}</h3>
@@ -62,7 +54,7 @@ function renderMenuItems(items, container) {
 
 
 /* ==========================================================================
-   STEPS 3 & 4: FORM VALIDATION & BROWSER STORAGE
+   FORM VALIDATION & LOCAL STORAGE
    ========================================================================== */
 
 function initFormValidationAndStorage() {
@@ -72,58 +64,71 @@ function initFormValidationAndStorage() {
     const messageInput = document.getElementById('message');
     const welcomeDiv = document.getElementById('welcome-message');
 
-    // Load stored user data from localStorage
+    // Load existing user data from browser storage on page load
     loadStoredUserData(nameInput, emailInput, welcomeDiv);
 
-    // Save field updates live as user types (only when text is not empty)
-    nameInput.addEventListener('input', () => {
-        if (nameInput.value.trim()) {
-            localStorage.setItem('bakery_user_name', nameInput.value.trim());
-        }
-    });
-
-    emailInput.addEventListener('input', () => {
-        if (emailInput.value.trim()) {
-            localStorage.setItem('bakery_user_email', emailInput.value.trim());
-        }
-    });
-
-    // Form Submission Validation
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        clearErrors();
-
-        const isNameValid = validateRequired(nameInput, 'name-error', 'Full name is required.');
-        const isEmailValid = validateEmail(emailInput);
-        const isMessageValid = validateMinLength(messageInput, 'message-error', 10, 'Message must be at least 10 characters.');
-
-        // Prevent submission if invalid
-        if (isNameValid && isEmailValid && isMessageValid) {
-            const savedName = nameInput.value.trim();
-            const savedEmail = emailInput.value.trim();
-
-            // Persist confirmed submission data explicitly
-            localStorage.setItem('bakery_user_name', savedName);
-            localStorage.setItem('bakery_user_email', savedEmail);
-
-            alert('Thank you! Your message has been sent successfully.');
-
-            // Only clear the message box so name/email stay filled in
-            messageInput.value = '';
-
-            // Update welcome banner immediately
-            if (welcomeDiv) {
-                welcomeDiv.innerHTML = `<p style="color: #78350f; font-weight: bold; margin-bottom: 1rem;">Welcome back, ${savedName}!</p>`;
+    // Save input text in real-time as user types
+    if (nameInput) {
+        nameInput.addEventListener('input', () => {
+            if (nameInput.value.trim() !== '') {
+                localStorage.setItem('bakery_user_name', nameInput.value.trim());
             }
-        }
-    });
+        });
+    }
+
+    if (emailInput) {
+        emailInput.addEventListener('input', () => {
+            if (emailInput.value.trim() !== '') {
+                localStorage.setItem('bakery_user_email', emailInput.value.trim());
+            }
+        });
+    }
+
+    // Intercept form submission
+    if (form) {
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            clearErrors();
+
+            const isNameValid = validateRequired(nameInput, 'name-error', 'Full name is required.');
+            const isEmailValid = validateEmail(emailInput);
+            const isMessageValid = validateMinLength(messageInput, 'message-error', 10, 'Message must be at least 10 characters.');
+
+            if (isNameValid && isEmailValid && isMessageValid) {
+                const finalName = nameInput.value.trim();
+                const finalEmail = emailInput.value.trim();
+
+                localStorage.setItem('bakery_user_name', finalName);
+                localStorage.setItem('bakery_user_email', finalEmail);
+
+                alert('Thank you! Your message has been sent successfully.');
+
+                if (welcomeDiv) {
+                    welcomeDiv.innerHTML = `<p style="color: #78350f; font-weight: bold; margin-bottom: 1rem;">Welcome back, ${finalName}!</p>`;
+                }
+            }
+        });
+    }
 }
 
-// Validation Helper Functions
+function loadStoredUserData(nameInput, emailInput, welcomeDiv) {
+    const savedName = localStorage.getItem('bakery_user_name');
+    const savedEmail = localStorage.getItem('bakery_user_email');
+
+    if (savedName) {
+        if (nameInput) nameInput.value = savedName;
+        if (welcomeDiv) {
+            welcomeDiv.innerHTML = `<p style="color: #78350f; font-weight: bold; margin-bottom: 1rem;">Welcome back, ${savedName}!</p>`;
+        }
+    }
+
+    if (savedEmail && emailInput) {
+        emailInput.value = savedEmail;
+    }
+}
 
 function validateRequired(input, errorId, message) {
-    if (!input.value.trim()) {
+    if (!input || !input.value.trim()) {
         showError(errorId, message);
         return false;
     }
@@ -131,6 +136,7 @@ function validateRequired(input, errorId, message) {
 }
 
 function validateEmail(input) {
+    if (!input) return false;
     const emailValue = input.value.trim();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -145,7 +151,7 @@ function validateEmail(input) {
 }
 
 function validateMinLength(input, errorId, minLength, message) {
-    if (input.value.trim().length < minLength) {
+    if (!input || input.value.trim().length < minLength) {
         showError(errorId, message);
         return false;
     }
@@ -162,21 +168,4 @@ function showError(elementId, message) {
 function clearErrors() {
     const errorSpans = document.querySelectorAll('.error-message');
     errorSpans.forEach(span => span.textContent = '');
-}
-
-// Browser Storage Helper Function
-function loadStoredUserData(nameInput, emailInput, welcomeDiv) {
-    const savedName = localStorage.getItem('bakery_user_name');
-    const savedEmail = localStorage.getItem('bakery_user_email');
-
-    if (savedName) {
-        nameInput.value = savedName;
-        if (welcomeDiv) {
-            welcomeDiv.innerHTML = `<p style="color: #78350f; font-weight: bold; margin-bottom: 1rem;">Welcome back, ${savedName}!</p>`;
-        }
-    }
-
-    if (savedEmail) {
-        emailInput.value = savedEmail;
-    }
 }
